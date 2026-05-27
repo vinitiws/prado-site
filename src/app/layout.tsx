@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   description:
     "Desde 1994, a Prado Calçados fabrica botinas e botas de segurança e tradicionais com durabilidade comprovada. Conheça nossa linha completa.",
-  metadataBase: new URL("https://www.prado.com.br"),
+  metadataBase: new URL("https://www.pradocalcados.com.br"),
   openGraph: {
     title: "Prado Calçados",
     description:

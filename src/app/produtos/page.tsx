@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { ProdutoListClient } from './produto-list-client'
 
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default async function ProdutosPage() {
-  return <ProdutoListClient />
+  return (
+    <Suspense fallback={<div className="text-center py-12 text-bege">Carregando...</div>}>
+      <ProdutoListClient />
+    </Suspense>
+  )
 }

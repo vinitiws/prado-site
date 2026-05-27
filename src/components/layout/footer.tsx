@@ -12,7 +12,7 @@ const footerLinks = {
   ],
   contato: [
     { label: 'Mogi Guaçu - SP' },
-    { label: 'contato@prado.com.br' },
+    { label: 'comercial@pradocalcados.com.br' },
   ],
 }
 
@@ -22,7 +22,12 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-lg font-bold">PRADO CALÇADOS</h3>
+            <img
+              src="/logo-principal.png"
+              alt="Prado Calçados Logo"
+              className="h-10 w-auto"
+            />
+            {/* <h3 className="text-lg font-bold">PRADO CALÇADOS</h3> */}
             <p className="text-sm text-bege/80 leading-relaxed">
               Desde 1994, fabricando botinas e botas com durabilidade comprovada
               e reposição rápida para o seu negócio.

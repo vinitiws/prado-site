@@ -20,10 +20,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-branco/95 backdrop-blur-sm border-b border-bege/20">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
+        <img
+            src="/logo.png"
+            alt="Prado Calçados Logo"
+            className="h-8 w-auto"
+          />
           <span className="text-xl font-bold text-marinho tracking-tight">
             PRADO
           </span>
-          <span className="hidden sm:inline text-sm text-bege font-medium">
+          <span className="hidden sm:inline text-sm text-safety font-medium">
             CALÇADOS
           </span>
         </Link>
