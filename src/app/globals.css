@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-branco: #FFFCF4;
+  --color-safety: #FEC761;
+  --color-country: #9F5234;
+  --color-azul: #2C3B4E;
+  --color-marinho: #1C2632;
+  --color-bege: #CCC1A9;
+  --font-sans: 'Grift', system-ui, -apple-system, sans-serif;
+}
+
+@font-face {
+  font-family: 'Grift';
+  src: url('/fonts/Grift-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Grift';
+  src: url('/fonts/Grift-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Grift';
+  src: url('/fonts/Grift-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #FFFCF4;
+  --foreground: #1C2632;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Grift', system-ui, -apple-system, sans-serif;
+}
