@@ -26,30 +26,46 @@ export function HeroCarousel() {
       })
   }, [])
 
+  const defaultSlides = [
+    {
+      url: '',
+      titulo: 'Tecnologia em Cada Passo',
+      subtitulo: 'Calçados profissionais com a mais alta tecnologia em segurança e conforto para o seu dia a dia.',
+      link: '/produtos',
+      gradiente: 'from-marinho via-azul to-marinho',
+    },
+    {
+      url: '',
+      titulo: 'Kit Starter Prado',
+      subtitulo: 'Comece com 30 pares e tenha reposição garantida direto da fábrica. Sem estoque encalhado.',
+      link: '/parceiro',
+      gradiente: 'from-country via-marinho to-marinho',
+    },
+    {
+      url: '',
+      titulo: 'Tradição desde 1994',
+      subtitulo: 'Mais de 30 anos calçando profissionais que pisam firme. Conheça nossa história.',
+      link: '/sobre',
+      gradiente: 'from-azul via-marinho to-marinho',
+    },
+  ]
+
+  const displaySlides = slides.length > 0 ? slides : defaultSlides
+  const activeSlide = displaySlides[current]
+
   useEffect(() => {
-    if (slides.length <= 1) return
+    if (displaySlides.length <= 1) return
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length)
+      setCurrent((prev) => (prev + 1) % displaySlides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [slides.length])
-
-  if (slides.length === 0) {
-    return (
-      <div className="w-full h-[70vh] min-h-[400px] max-h-[700px] bg-marinho flex items-center justify-center">
-        <div className="text-center text-branco">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-2">
-            PRADO CALÇADOS
-          </h2>
-          <p className="text-bege">Tradição e Tecnologia desde 1994</p>
-        </div>
-      </div>
-    )
-  }
+  }, [displaySlides.length])
 
   const prev = () =>
-    setCurrent((c) => (c - 1 + slides.length) % slides.length)
-  const next = () => setCurrent((c) => (c + 1) % slides.length)
+    setCurrent((c) => (c - 1 + displaySlides.length) % displaySlides.length)
+  const next = () => setCurrent((c) => (c + 1) % displaySlides.length)
+
+  const isDefault = slides.length === 0
 
   return (
     <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] overflow-hidden bg-marinho">
@@ -62,13 +78,17 @@ export function HeroCarousel() {
           transition={{ duration: 0.7 }}
           className="absolute inset-0"
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${slides[current].url})`,
-              backgroundColor: '#1C2632',
-            }}
-          />
+          {activeSlide.url ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url(${activeSlide.url})`,
+                backgroundColor: '#1C2632',
+              }}
+            />
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-br ${isDefault ? (activeSlide as any).gradiente : 'from-marinho via-azul to-marinho'}`} />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-marinho/80 to-marinho/30" />
         </motion.div>
       </AnimatePresence>
@@ -83,20 +103,20 @@ export function HeroCarousel() {
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {slides[current].titulo && (
+              {activeSlide.titulo && (
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-branco mb-4">
-                  {slides[current].titulo}
+                  {activeSlide.titulo}
                 </h2>
               )}
-              {slides[current].subtitulo && (
+              {activeSlide.subtitulo && (
                 <p className="text-lg sm:text-xl text-bege mb-8 max-w-lg">
-                  {slides[current].subtitulo}
+                  {activeSlide.subtitulo}
                 </p>
               )}
-              {slides[current].link && (
-                <Link href={slides[current].link!}>
+              {activeSlide.link && (
+                <Link href={activeSlide.link}>
                   <Button variant="primary" size="lg">
-                    {slides[current].titulo || 'Ver mais'}
+                    {(activeSlide as any).cta_texto || 'Saiba mais'}
                   </Button>
                 </Link>
               )}
@@ -121,7 +141,7 @@ export function HeroCarousel() {
       </button>
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, i) => (
+        {displaySlides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}

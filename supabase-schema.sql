@@ -59,6 +59,7 @@ CREATE TABLE site_imagens (
   link TEXT,
   titulo TEXT,
   subtitulo TEXT,
+  cta_texto TEXT,
   ordem INTEGER DEFAULT 0,
   ativo BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -137,3 +138,8 @@ INSERT INTO subcategorias (categoria_id, nome, slug, descricao, ordem) VALUES
 -- ============================================================
 -- Execute in Supabase Storage > Create bucket "imagens"
 -- Make it public for reading images
+
+-- Storage RLS policies (run after creating the bucket)
+-- CREATE POLICY "Public read imagens" ON storage.objects FOR SELECT USING (bucket_id = 'imagens');
+-- CREATE POLICY "Authenticated upload imagens" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'imagens' AND auth.role() = 'authenticated');
+-- CREATE POLICY "Authenticated delete imagens" ON storage.objects FOR DELETE USING (bucket_id = 'imagens' AND auth.role() = 'authenticated');

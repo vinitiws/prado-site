@@ -1,16 +1,27 @@
+'use client'
+
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 
-export default async function AdminProdutosPage() {
-  const supabase = await createClient()
-  if (!supabase) return <div>Supabase não configurado</div>
+export default function AdminProdutosPage() {
+  const [supabase] = useState(() => createClient())
+  const [produtos, setProdutos] = useState<any[]>([])
 
-  const { data: produtos } = await supabase
-    .from('produtos')
-    .select('*, subcategoria:subcategorias(nome)')
-    .order('created_at', { ascending: false })
+  useEffect(() => {
+    if (!supabase) return
+    supabase
+      .from('produtos')
+      .select('*, subcategoria:subcategorias(nome)')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (data) setProdutos(data)
+      })
+  }, [supabase])
+
+  if (!supabase) return <div>Supabase não configurado</div>
 
   return (
     <div>

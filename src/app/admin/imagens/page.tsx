@@ -24,6 +24,7 @@ export default function AdminImagensPage() {
     tipo: 'carousel' as SiteImagem['tipo'],
     titulo: '',
     subtitulo: '',
+    cta_texto: '',
     link: '',
   })
 
@@ -46,46 +47,31 @@ export default function AdminImagensPage() {
   }, [loadImagens])
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!supabase) return
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploading(true)
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Date.now()}.${fileExt}`
-    const filePath = `site/${form.tipo}/${fileName}`
 
-    const { error: uploadError } = await supabase.storage
-      .from('imagens')
-      .upload(filePath, file)
+    const body = new FormData()
+    body.append('file', file)
+    body.append('tipo', form.tipo)
+    if (form.titulo) body.append('titulo', form.titulo)
+    if (form.subtitulo) body.append('subtitulo', form.subtitulo)
+    if (form.cta_texto) body.append('cta_texto', form.cta_texto)
+    if (form.link) body.append('link', form.link)
+    body.append('ordem', String(imagens.length))
 
-    if (uploadError) {
-      alert('Erro ao fazer upload: ' + uploadError.message)
-      setUploading(false)
-      return
-    }
-
-    const { data: urlData } = supabase.storage
-      .from('imagens')
-      .getPublicUrl(filePath)
-
-    const { error: dbError } = await supabase.from('site_imagens').insert({
-      tipo: form.tipo,
-      url: urlData.publicUrl,
-      titulo: form.titulo || null,
-      subtitulo: form.subtitulo || null,
-      link: form.link || null,
-      ordem: imagens.length,
-    })
+    const res = await fetch('/api/upload', { method: 'POST', body })
 
     setUploading(false)
 
-    if (dbError) {
-      alert('Erro ao salvar: ' + dbError.message)
+    if (!res.ok) {
+      const { error } = await res.json()
+      alert('Erro ao fazer upload: ' + error)
       return
     }
 
-    setForm({ tipo: 'carousel', titulo: '', subtitulo: '', link: '' })
+    setForm({ tipo: 'carousel', titulo: '', subtitulo: '', cta_texto: '', link: '' })
     loadImagens()
   }
 
@@ -110,7 +96,7 @@ export default function AdminImagensPage() {
 
       <div className="bg-branco rounded-xl border border-bege/20 p-6 mb-8">
         <h2 className="text-lg font-bold text-marinho mb-4">Adicionar Imagem</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-marinho mb-1">
               Tipo
@@ -151,6 +137,14 @@ export default function AdminImagensPage() {
             label="Link (opcional)"
             value={form.link}
             onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
+          />
+          <Input
+            id="cta_texto"
+            label="Texto do Botão"
+            value={form.cta_texto}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, cta_texto: e.target.value }))
+            }
           />
         </div>
         <div>
@@ -203,6 +197,11 @@ export default function AdminImagensPage() {
                       {img.link && (
                         <p className="text-xs text-bege truncate">
                           {img.link}
+                        </p>
+                      )}
+                      {img.cta_texto && (
+                        <p className="text-xs text-safety font-medium truncate">
+                          Botão: {img.cta_texto}
                         </p>
                       )}
                     </div>
