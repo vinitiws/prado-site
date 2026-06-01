@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,62 +10,100 @@ import type { SiteImagem } from '@/types'
 
 export function HeroCarousel() {
   const [slides, setSlides] = useState<SiteImagem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
-    if (!supabase) return
+    
+    if (!supabase) {
+      console.error('HeroCarousel: Supabase client não inicializado')
+      setError('Erro ao conectar com o banco de dados')
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+
     supabase
       .from('site_imagens')
       .select('*')
       .eq('tipo', 'carousel')
       .eq('ativo', true)
       .order('ordem')
-      .then(({ data }) => {
-        if (data && data.length > 0) setSlides(data)
+      .then(({ data, error: queryError }) => {
+        if (cancelled) return
+        
+        if (queryError) {
+          console.error('HeroCarousel: Erro ao buscar imagens:', queryError)
+          setError('Erro ao carregar imagens do carousel')
+          setLoading(false)
+          return
+        }
+
+        if (data && data.length > 0) {
+          console.log(`HeroCarousel: ${data.length} imagens carregadas`)
+          setSlides(data)
+        } else {
+          console.warn('HeroCarousel: Nenhuma imagem encontrada no banco de dados')
+        }
+        
+        setLoading(false)
       })
+      .catch((err) => {
+        if (cancelled) return
+        console.error('HeroCarousel: Erro inesperado:', err)
+        setError('Erro ao carregar carousel')
+        setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const defaultSlides = [
-    {
-      url: '',
-      titulo: 'Tecnologia em Cada Passo',
-      subtitulo: 'Calçados profissionais com a mais alta tecnologia em segurança e conforto para o seu dia a dia.',
-      link: '/produtos',
-      gradiente: 'from-marinho via-azul to-marinho',
-    },
-    {
-      url: '',
-      titulo: 'Kit Starter Prado',
-      subtitulo: 'Comece com 30 pares e tenha reposição garantida direto da fábrica. Sem estoque encalhado.',
-      link: '/parceiro',
-      gradiente: 'from-country via-marinho to-marinho',
-    },
-    {
-      url: '',
-      titulo: 'Tradição desde 1994',
-      subtitulo: 'Mais de 30 anos calçando profissionais que pisam firme. Conheça nossa história.',
-      link: '/sobre',
-      gradiente: 'from-azul via-marinho to-marinho',
-    },
-  ]
-
-  const displaySlides = slides.length > 0 ? slides : defaultSlides
-  const activeSlide = displaySlides[current]
-
   useEffect(() => {
-    if (displaySlides.length <= 1) return
+    if (slides.length <= 1) return
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % displaySlides.length)
+      setCurrent((prev) => (prev + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [displaySlides.length])
+  }, [slides.length])
 
-  const prev = () =>
-    setCurrent((c) => (c - 1 + displaySlides.length) % displaySlides.length)
-  const next = () => setCurrent((c) => (c + 1) % displaySlides.length)
+  const prev = useCallback(() =>
+    setCurrent((c) => (c - 1 + slides.length) % slides.length), [slides.length])
+  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), [slides.length])
 
-  const isDefault = slides.length === 0
+  if (loading) {
+    return (
+      <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] bg-marinho animate-pulse" />
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] bg-marinho flex items-center justify-center">
+        <div className="text-center text-branco">
+          <p className="text-xl mb-2">⚠️ {error}</p>
+          <p className="text-sm text-bege">Verifique o console para mais detalhes</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (slides.length === 0) {
+    return (
+      <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] bg-marinho flex items-center justify-center">
+        <div className="text-center text-branco">
+          <p className="text-xl mb-2">📷 Nenhuma imagem no carousel</p>
+          <p className="text-sm text-bege">Adicione imagens do tipo "carousel" no banco de dados</p>
+        </div>
+      </div>
+    )
+  }
+
+  const activeSlide = slides[current]
 
   return (
     <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] overflow-hidden bg-marinho">
@@ -78,17 +116,20 @@ export function HeroCarousel() {
           transition={{ duration: 0.7 }}
           className="absolute inset-0"
         >
-          {activeSlide.url ? (
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${activeSlide.url})`,
-                backgroundColor: '#1C2632',
-              }}
-            />
-          ) : (
-            <div className={`absolute inset-0 bg-gradient-to-br ${isDefault ? (activeSlide as any).gradiente : 'from-marinho via-azul to-marinho'}`} />
-          )}
+          <div
+            className="hidden md:block absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${activeSlide.url})`,
+              backgroundColor: '#1C2632',
+            }}
+          />
+          <div
+            className="block md:hidden absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${activeSlide.url})`,
+              backgroundColor: '#1C2632',
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-marinho/80 to-marinho/30" />
         </motion.div>
       </AnimatePresence>
@@ -114,44 +155,48 @@ export function HeroCarousel() {
                 </p>
               )}
               {activeSlide.link && (
-                <Link href={activeSlide.link}>
-                  <Button variant="primary" size="lg">
-                    {(activeSlide as any).cta_texto || 'Saiba mais'}
-                  </Button>
-                </Link>
+                <Button variant="primary" size="lg" asChild>
+                  <Link href={activeSlide.link}>
+                    Saiba mais
+                  </Link>
+                </Button>
               )}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
-      <button
-        onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-branco/10 hover:bg-branco/20 text-branco transition-colors"
-        aria-label="Slide anterior"
-      >
-        <ChevronLeft size={24} />
-      </button>
-      <button
-        onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-branco/10 hover:bg-branco/20 text-branco transition-colors"
-        aria-label="Próximo slide"
-      >
-        <ChevronRight size={24} />
-      </button>
-
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {displaySlides.map((_, i) => (
+      {slides.length > 1 && (
+        <>
           <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              i === current ? 'bg-safety w-8' : 'bg-branco/40'
-            }`}
-            aria-label={`Slide ${i + 1}`}
-          />
-        ))}
-      </div>
+            onClick={prev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-branco/10 hover:bg-branco/20 text-branco transition-colors"
+            aria-label="Slide anterior"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-branco/10 hover:bg-branco/20 text-branco transition-colors"
+            aria-label="Próximo slide"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  i === current ? 'bg-safety w-8' : 'bg-branco/40'
+                }`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

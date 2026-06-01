@@ -56,6 +56,9 @@ CREATE TABLE site_imagens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo TEXT NOT NULL CHECK (tipo IN ('carousel', 'card', 'banner')),
   url TEXT NOT NULL,
+  url_mobile TEXT,
+  storage_path TEXT,
+  storage_path_mobile TEXT,
   link TEXT,
   titulo TEXT,
   subtitulo TEXT,
@@ -140,6 +143,6 @@ INSERT INTO subcategorias (categoria_id, nome, slug, descricao, ordem) VALUES
 -- Make it public for reading images
 
 -- Storage RLS policies (run after creating the bucket)
--- CREATE POLICY "Public read imagens" ON storage.objects FOR SELECT USING (bucket_id = 'imagens');
--- CREATE POLICY "Authenticated upload imagens" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'imagens' AND auth.role() = 'authenticated');
--- CREATE POLICY "Authenticated delete imagens" ON storage.objects FOR DELETE USING (bucket_id = 'imagens' AND auth.role() = 'authenticated');
+CREATE POLICY "Public read imagens" ON storage.objects FOR SELECT USING (bucket_id = 'imagens');
+CREATE POLICY "Authenticated upload imagens" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'imagens' AND auth.role() = 'authenticated');
+CREATE POLICY "Authenticated delete imagens" ON storage.objects FOR DELETE USING (bucket_id = 'imagens' AND auth.role() = 'authenticated');

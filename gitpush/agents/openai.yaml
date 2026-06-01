@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Push & PR"
+  short_description: "Push changes and create PR with confirmation"
+  default_prompt: "Push my changes and create a PR"
