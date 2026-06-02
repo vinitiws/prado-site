@@ -2,6 +2,7 @@ import { HeroCarousel } from '@/components/home/hero-carousel'
 import { ProductCards } from '@/components/home/product-cards'
 import { CategoryGrid } from '@/components/home/category-grid'
 import { BannerSection } from '@/components/home/banner-section'
+import { PromotionalBanner } from '@/components/home/promotional-banner'
 import { AnimatedSection } from '@/components/ui/animated-section'
 
 async function getDestaques() {
@@ -42,6 +43,12 @@ export default async function Home() {
         <ProductCards produtos={destaques} />
       </AnimatedSection>
 
+      <PromotionalBanner 
+        tipo="banner-pos-produtos" 
+        desktopHeight="h-[400px]"
+        mobileHeight="h-[250px]"
+      />
+
       <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-marinho mb-3">
@@ -61,8 +68,15 @@ export default async function Home() {
           subtitle="Cada par encalhado é dinheiro dormindo na prateleira. Comece com 30 pares no Kit Starter e tenha reposição garantida direto da fábrica."
           cta="Quero ser parceiro Prado"
           href="/parceiro"
+          disableAnimation={true}
         />
       </AnimatedSection>
+
+      <PromotionalBanner 
+        tipo="banner-pos-cta" 
+        desktopHeight="h-[400px]"
+        mobileHeight="h-[250px]"
+      />
 
       <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
