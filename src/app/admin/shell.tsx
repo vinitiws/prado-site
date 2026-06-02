@@ -14,7 +14,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-bege/10 flex">
-      <aside className="hidden lg:flex flex-col w-64 bg-marinho text-branco p-6">
+      <aside className="fixed top-0 left-0 h-screen hidden lg:flex flex-col w-64 bg-marinho text-branco p-6">
         <Link href="/admin/dashboard" className="text-lg font-bold mb-8">
           PRADO ADMIN
         </Link>
@@ -48,7 +48,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </form>
       </aside>
 
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen lg:ml-64">
         <header className="lg:hidden bg-marinho text-branco px-4 py-3 flex items-center justify-between">
           <span className="font-bold">PRADO ADMIN</span>
           <nav className="flex gap-4">

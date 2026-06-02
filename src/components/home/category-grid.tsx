@@ -30,35 +30,58 @@ const categorias = [
   },
 ]
 
-export function CategoryGrid() {
+interface CategoryGridProps {
+  disableAnimation?: boolean
+}
+
+export function CategoryGrid({ disableAnimation = false }: CategoryGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {categorias.map((cat, index) => {
         const Icon = cat.icon
+        
+        const cardContent = (
+          <Link href={`/produtos?categoria=${cat.slug}`} className="block h-full">
+            <Card className="group h-full p-6 hover:border-safety/30 hover:shadow-lg cursor-pointer transition-all duration-300">
+              <div
+                className={`w-12 h-12 rounded-lg ${cat.cor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+              >
+                <Icon size={24} strokeWidth={2} />
+              </div>
+              <h3 className="text-lg font-bold text-marinho mb-2 group-hover:text-azul transition-colors">
+                {cat.nome}
+              </h3>
+              <p className="text-sm text-bege mb-4 leading-relaxed">
+                {cat.descricao}
+              </p>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="group-hover:translate-x-1 transition-transform duration-300"
+              >
+                Ver modelos &rarr;
+              </Button>
+            </Card>
+          </Link>
+        )
+
+        if (disableAnimation) {
+          return <div key={cat.slug}>{cardContent}</div>
+        }
+
         return (
           <motion.div
             key={cat.slug}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ 
+              duration: 0.4, 
+              delay: index * 0.1,
+              ease: 'easeOut'
+            }}
           >
-            <Link href={`/produtos?categoria=${cat.slug}`}>
-              <Card className="group h-full p-6 hover:border-safety/30 cursor-pointer">
-                <div
-                  className={`w-12 h-12 rounded-lg ${cat.cor} flex items-center justify-center mb-4`}
-                >
-                  <Icon size={24} />
-                </div>
-                <h3 className="text-lg font-bold text-marinho mb-2">
-                  {cat.nome}
-                </h3>
-                <p className="text-sm text-bege mb-4">{cat.descricao}</p>
-                <Button variant="ghost" size="sm" className="group-hover:translate-x-1 transition-transform">
-                  Ver modelos &rarr;
-                </Button>
-              </Card>
-            </Link>
+            {cardContent}
           </motion.div>
         )
       })}
