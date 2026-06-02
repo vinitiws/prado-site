@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { use } from 'react'
+import { ProductImageUpload } from '@/components/admin/product-image-upload'
 import type { Categoria, Subcategoria, Produto } from '@/types'
 
 interface Props {
@@ -16,6 +17,8 @@ export default function EditarProdutoPage({ params }: Props) {
   const { id } = use(params)
   const router = useRouter()
   const [supabase] = useState(() => createClient())
+  const imageUploadRef = useRef<any>(null)
+  const [existingImages, setExistingImages] = useState<any[]>([])
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
@@ -65,6 +68,13 @@ export default function EditarProdutoPage({ params }: Props) {
         .select('*')
         .order('ordem')
       if (cats) setCategorias(cats)
+
+      const { data: imgs } = await supabase
+        .from('produto_imagens')
+        .select('*')
+        .eq('produto_id', id)
+        .order('ordem')
+      if (imgs) setExistingImages(imgs)
 
       setInitialLoading(false)
     }
@@ -131,6 +141,7 @@ export default function EditarProdutoPage({ params }: Props) {
     }
 
     router.push('/admin/produtos')
+    await imageUploadRef.current?.uploadNewImages(id)
     router.refresh()
   }
 
@@ -256,6 +267,7 @@ export default function EditarProdutoPage({ params }: Props) {
         </div>
 
         <label className="flex items-center gap-3 cursor-pointer">
+        <ProductImageUpload ref={imageUploadRef} existingImages={existingImages} maxImages={3} />
           <input
             type="checkbox"
             checked={form.destaque}

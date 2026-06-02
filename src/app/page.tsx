@@ -44,7 +44,7 @@ export default async function Home() {
       </AnimatedSection>
 
       <PromotionalBanner 
-        tipo="banner-pos-produtos" 
+        tipo="banner" 
         desktopHeight="h-[400px]"
         mobileHeight="h-[250px]"
       />

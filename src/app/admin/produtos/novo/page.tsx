@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ProductImageUpload } from '@/components/admin/product-image-upload'
 import type { Categoria, Subcategoria } from '@/types'
 
 export default function NovoProdutoPage() {
   const router = useRouter()
   const [supabase] = useState(() => createClient())
 
+  const imageUploadRef = useRef<any>(null)
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [selectedCat, setSelectedCat] = useState('')
@@ -75,7 +77,7 @@ export default function NovoProdutoPage() {
       .replace(/\s+/g, '-')
       .concat('-ref-', form.ref.toLowerCase().replace(/[^\w]/g, ''))
 
-    const { error } = await supabase.from('produtos').insert({
+    const { data: newProducts, error } = await supabase.from('produtos').insert({
       nome: form.nome,
       ref: form.ref,
       slug,
@@ -89,13 +91,16 @@ export default function NovoProdutoPage() {
         biqueira: form.especificacoes_biqueira || undefined,
         norma: form.especificacoes_norma || undefined,
       },
-    })
+    }).select()
 
     setLoading(false)
 
     if (error) {
       alert('Erro ao criar produto: ' + error.message)
       return
+    }
+    if (newProducts && newProducts.length > 0) {
+      await imageUploadRef.current?.uploadNewImages(newProducts[0].id)
     }
 
     router.push('/admin/produtos')
@@ -218,6 +223,8 @@ export default function NovoProdutoPage() {
             onChange={(e) => updateField('especificacoes_norma', e.target.value)}
           />
         </div>
+        <ProductImageUpload ref={imageUploadRef} maxImages={3} />
+
 
         <label className="flex items-center gap-3 cursor-pointer">
           <input
