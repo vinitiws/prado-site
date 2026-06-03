@@ -1,14 +1,12 @@
 'use client'
-
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Trash2, Eye, EyeOff, ArrowUp, ArrowDown, Upload } from 'lucide-react'
 import type { SiteImagem } from '@/types'
+import { EditImageModal } from '@/components/admin/edit-image-modal'
 import type { SupabaseClient } from '@supabase/supabase-js'
-
 const supabaseClient = createClient()
-
 const tipos = [
   { value: 'carousel' as const, label: 'Carousel (Hero)' },
   { value: 'card' as const, label: 'Card de Categoria' },
@@ -23,6 +21,7 @@ export default function AdminImagensPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [editingImage, setEditingImage] = useState<SiteImagem | null>(null)
 
   const [form, setForm] = useState({
     tipo: 'carousel' as SiteImagem['tipo'],
@@ -44,11 +43,9 @@ export default function AdminImagensPage() {
     if (data) setImagens(data)
     setLoading(false)
   }, [])
-
   useEffect(() => {
     loadImagens()
   }, [loadImagens])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -66,7 +63,6 @@ export default function AdminImagensPage() {
     if (form.subtitulo) body.append('subtitulo', form.subtitulo)
     if (form.link) body.append('link', form.link)
     body.append('ordem', String(imagens.length))
-
     const res = await fetch('/api/upload', { method: 'POST', body })
 
     setUploading(false)
@@ -283,6 +279,13 @@ export default function AdminImagensPage() {
                       <p className="text-xs text-bege/60 mt-1">
                         Ordem: {img.ordem}
                       </p>
+                      <button
+                        onClick={() => setEditingImage(img)}
+                        className="mt-2 px-3 py-1.5 rounded-lg bg-azul/80 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-azul font-medium flex items-center gap-1.5 w-full justify-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        Editar
+                      </button>
                     </div>
 
                     <div className="absolute top-2 left-2 flex gap-1">
@@ -290,8 +293,7 @@ export default function AdminImagensPage() {
                         onClick={() => handleMoveOrder(img.id, 'up')}
                         disabled={filtered.indexOf(img) === 0}
                         className="p-1.5 rounded-lg bg-marinho/60 text-branco opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-marinho/80"
-                        title="Mover para cima"
-                      >
+                        title="Mover para cima" >
                         <ArrowUp size={14} />
                       </button>
                       <button
@@ -337,6 +339,11 @@ export default function AdminImagensPage() {
           Nenhuma imagem cadastrada ainda.
         </p>
       )}
+      <EditImageModal
+        image={editingImage}
+        onClose={() => setEditingImage(null)}
+        onSaved={loadImagens}
+      />
     </div>
   )
 }

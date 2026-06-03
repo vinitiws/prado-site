@@ -7,6 +7,7 @@ const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 
 const uploadSchema = z.object({
   tipo: z.enum(['carousel', 'card', 'banner']),
+  id: z.string().nullable().optional(),
   titulo: z.string().nullable().optional(),
   subtitulo: z.string().nullable().optional(),
   link: z.string().nullable().optional(),
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
 
   const parsed = uploadSchema.safeParse({
     tipo: formData.get('tipo'),
+    id: formData.get('id'),
     titulo: formData.get('titulo'),
     subtitulo: formData.get('subtitulo'),
     link: formData.get('link'),
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errors }, { status: 400 })
   }
 
-  const { tipo, titulo, subtitulo, link, ordem } = parsed.data
+  const { tipo, id, titulo, subtitulo, link, ordem } = parsed.data
 
   const fileExt = file.name.split('.').pop()
   const fileName = `${Date.now()}.${fileExt}`
@@ -70,6 +72,49 @@ export async function POST(request: Request) {
     .from('imagens')
     .getPublicUrl(filePath)
 
+  // If editing an existing image, update it instead of inserting
+  if (id) {
+    // Get old image URL to delete from storage
+    const { data: oldImg } = await supabase
+      .from('site_imagens')
+      .select('url')
+      .eq('id', id)
+      .single()
+
+    const { data, error: dbError } = await supabase
+      .from('site_imagens')
+      .update({
+        url: urlData.publicUrl,
+        titulo: titulo || null,
+        subtitulo: subtitulo || null,
+        link: link || null,
+      })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (dbError) {
+      await supabase.storage.from('imagens').remove([filePath])
+      return NextResponse.json({ error: dbError.message }, { status: 500 })
+    }
+
+    // Delete old file from storage
+    if (oldImg?.url) {
+      try {
+        const u = new URL(oldImg.url)
+        const prefix = '/object/public/imagens/'
+        const pathIndex = u.pathname.indexOf(prefix)
+        if (pathIndex !== -1) {
+          const oldPath = u.pathname.slice(pathIndex + prefix.length)
+          await supabase.storage.from('imagens').remove([oldPath])
+        }
+      } catch { /* ignore old file deletion errors */ }
+    }
+
+    return NextResponse.json(data)
+  }
+
+  // Create new record (original behavior)
   const { data, error: dbError } = await supabase
     .from('site_imagens')
     .insert({
@@ -84,7 +129,6 @@ export async function POST(request: Request) {
     .single()
 
   if (dbError) {
-    // If insert failed, clean up uploaded file
     await supabase.storage.from('imagens').remove([filePath])
     return NextResponse.json({ error: dbError.message }, { status: 500 })
   }

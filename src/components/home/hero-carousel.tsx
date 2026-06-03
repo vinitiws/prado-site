@@ -16,7 +16,7 @@ export function HeroCarousel() {
 
   useEffect(() => {
     const supabase = createClient()
-    
+
     if (!supabase) {
       console.error('HeroCarousel: Supabase client não inicializado')
       setError('Erro ao conectar com o banco de dados')
@@ -26,15 +26,17 @@ export function HeroCarousel() {
 
     let cancelled = false
 
-    supabase
-      .from('site_imagens')
-      .select('*')
-      .eq('tipo', 'carousel')
-      .eq('ativo', true)
-      .order('ordem')
-      .then(({ data, error: queryError }) => {
+    ;(async () => {
+      try {
+        const { data, error: queryError } = await supabase
+          .from('site_imagens')
+          .select('*')
+          .eq('tipo', 'carousel')
+          .eq('ativo', true)
+          .order('ordem')
+
         if (cancelled) return
-        
+
         if (queryError) {
           console.error('HeroCarousel: Erro ao buscar imagens:', queryError)
           setError('Erro ao carregar imagens do carousel')
@@ -48,15 +50,15 @@ export function HeroCarousel() {
         } else {
           console.warn('HeroCarousel: Nenhuma imagem encontrada no banco de dados')
         }
-        
+
         setLoading(false)
-      })
-      .catch((err) => {
+      } catch (err) {
         if (cancelled) return
         console.error('HeroCarousel: Erro inesperado:', err)
         setError('Erro ao carregar carousel')
         setLoading(false)
-      })
+      }
+    })()
 
     return () => {
       cancelled = true

@@ -33,13 +33,15 @@ export function PromotionalBanner({
 
     let cancelled = false
 
-    supabase
-      .from('site_imagens')
-      .select('*')
-      .eq('tipo', tipo)
-      .eq('ativo', true)
-      .order('ordem')
-      .then(({ data, error: queryError }) => {
+    ;(async () => {
+      try {
+        const { data, error: queryError } = await supabase
+          .from('site_imagens')
+          .select('*')
+          .eq('tipo', tipo)
+          .eq('ativo', true)
+          .order('ordem')
+
         if (cancelled) return
 
         if (queryError) {
@@ -56,12 +58,12 @@ export function PromotionalBanner({
         }
 
         setLoading(false)
-      })
-      .catch((err) => {
+      } catch (err) {
         if (cancelled) return
         console.error('PromotionalBanner: Erro inesperado:', err)
         setLoading(false)
-      })
+      }
+    })()
 
     return () => {
       cancelled = true
