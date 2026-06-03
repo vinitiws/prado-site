@@ -7,7 +7,7 @@ import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 export const metadata: Metadata = {
   title: {
     template: "%s | Prado Calçados",
-    default: "Prado Calçados - Botinas e Botas de Qualidade Desde 1994",
+    default: "Prado Calçados | Fabricante de Botinas, Botas e Calçados de Segurança Desde 1994",
   },
   description:
     "Desde 1994, a Prado Calçados fabrica botinas e botas de segurança e tradicionais com durabilidade comprovada. Conheça nossa linha completa.",
@@ -15,11 +15,28 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Prado Calçados",
     description:
-      "Botinas e Botas de Qualidade Desde 1994. Tradição e Tecnologia em cada par.",
+      "A Prado Calçados fabrica botinas, botas e calçados de segurança desde 1994. Produtos resistentes, confortáveis e desenvolvidos para o trabalho e o dia a dia.",
+      url: "https://www.pradocalcados.com.br",
     locale: "pt_BR",
     type: "website",
     siteName: "Prado Calçados",
   },
+  keywords: [
+    "Prado Calçados",
+    "Botinas de Segurança",
+    "Botas de Segurança",
+    "Calçados de Segurança",
+    "Calçados Tradicionais",
+    "Calçados para Trabalho",
+    "Calçados Confortáveis",
+    "Calçados Duráveis",
+    "botinas",
+    "botinas de segurança",
+    "botas de segurança",
+    "calçados de segurança",
+    "fabricante de botinas",
+    "botina de couro",
+  ],
 };
 
 export default function RootLayout({
