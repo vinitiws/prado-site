@@ -2,6 +2,7 @@
 
 import { MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { FaWhatsapp } from "react-icons/fa";
 
 const WHATSAPP_NUMBER = '5519998256810'
 const WHATSAPP_MESSAGE =
@@ -21,7 +22,7 @@ export function WhatsAppButton() {
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 hover:scale-110 transition-all"
       aria-label="Fale conosco pelo WhatsApp"
     >
-      <MessageCircle size={28} />
+      <FaWhatsapp  size={28} />
     </motion.a>
   )
 }
