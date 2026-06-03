@@ -11,4 +11,9 @@ const nextConfig: NextConfig = {
   },
 };
 
+// Em dev, usar /tmp/.next para evitar lentidão do filesystem do container
+if (process.env.NODE_ENV === "development") {
+  nextConfig.distDir = "/tmp/.next";
+}
+
 export default nextConfig;

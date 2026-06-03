@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
 
 const navLinks = [
   { href: '/', label: 'Início' },
@@ -43,11 +42,6 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="/admin/login">
-            <Button variant="ghost" size="sm">
-              Admin
-            </Button>
-          </Link>
         </nav>
 
         <button
@@ -78,11 +72,6 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/admin/login" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" size="sm" className="w-full">
-                  Admin
-                </Button>
-              </Link>
             </nav>
           </motion.div>
         )}

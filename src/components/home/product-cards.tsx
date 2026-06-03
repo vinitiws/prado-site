@@ -45,7 +45,7 @@ export function ProductCards({ produtos, disableAnimation = false }: ProductCard
                   </div>
                 )}
               </div>
-              <div className="p-3 sm:p-4">
+              <div className="p-3 sm:p-4 h-[130px] overflow-hidden">
                 <span className="inline-block text-xs font-medium text-safety bg-safety/10 px-2 py-1 rounded-full">
                   {produto.ref}
                 </span>

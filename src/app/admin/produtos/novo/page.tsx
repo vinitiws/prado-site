@@ -17,6 +17,8 @@ export default function NovoProdutoPage() {
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([])
   const [selectedCat, setSelectedCat] = useState('')
   const [loading, setLoading] = useState(false)
+  const [refDuplicada, setRefDuplicada] = useState(false)
+  const [verificandoRef, setVerificandoRef] = useState(false)
 
   const [form, setForm] = useState({
     nome: '',
@@ -66,9 +68,40 @@ export default function NovoProdutoPage() {
       })
   }, [selectedCat, supabase])
 
+  // Verificar ref quando o usuário digitar
+  useEffect(() => {
+    if (!supabase || !form.ref.trim()) {
+      setRefDuplicada(false)
+      return
+    }
+
+    const ref = form.ref.trim()
+    setVerificandoRef(true)
+
+    const timer = setTimeout(async () => {
+      const { data } = await supabase
+        .from('produtos')
+        .select('id')
+        .eq('ref', ref)
+        .maybeSingle()
+
+      setRefDuplicada(!!data)
+      setVerificandoRef(false)
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [form.ref, supabase])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!supabase) return
+
+    // Verificação extra antes de salvar
+    if (refDuplicada) {
+      alert('Já existe um produto com esta referência. Use uma ref diferente.')
+      return
+    }
+
     setLoading(true)
 
     const slug = form.nome
@@ -124,13 +157,23 @@ export default function NovoProdutoPage() {
             onChange={(e) => updateField('nome', e.target.value)}
             required
           />
-          <Input
-            id="ref"
-            label="Referência"
-            value={form.ref}
-            onChange={(e) => updateField('ref', e.target.value)}
-            required
-          />
+          <div>
+            <Input
+              id="ref"
+              label="Referência"
+              value={form.ref}
+              onChange={(e) => updateField('ref', e.target.value)}
+              required
+            />
+            {refDuplicada && (
+              <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                ⚠️ Esta referência já está em uso por outro produto.
+              </p>
+            )}
+            {verificandoRef && form.ref.trim() && (
+              <p className="mt-1 text-xs text-bege">Verificando...</p>
+            )}
+          </div>
         </div>
 
         <div>
@@ -225,7 +268,6 @@ export default function NovoProdutoPage() {
         </div>
         <ProductImageUpload ref={imageUploadRef} maxImages={3} />
 
-
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -239,7 +281,7 @@ export default function NovoProdutoPage() {
         </label>
 
         <div className="flex gap-4">
-          <Button type="submit" variant="primary" disabled={loading}>
+          <Button type="submit" variant="primary" disabled={loading || refDuplicada}>
             {loading ? 'Salvando...' : 'Salvar Produto'}
           </Button>
           <Button

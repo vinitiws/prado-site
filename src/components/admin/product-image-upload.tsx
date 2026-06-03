@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, forwardRef, useImperativeHandle } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { X, Upload } from 'lucide-react'
@@ -55,36 +54,49 @@ export const ProductImageUpload = forwardRef<ProductImageUploadHandle, ProductIm
 
     const removeExisting = async (img: ImageItem) => {
       if (!confirm('Remover esta imagem?')) return
-      const supabase = createClient()
-      if (!supabase) return
       setUploading(true)
-      const { error } = await supabase.from('produto_imagens').delete().eq('id', img.id)
-      setUploading(false)
-      if (error) { alert('Erro: ' + error.message); return }
-      setExisting((p) => p.filter((x) => x.id !== img.id))
+      try {
+        const res = await fetch('/api/produtos/imagens', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageId: img.id }),
+        })
+        if (!res.ok) {
+          const err = await res.json()
+          alert('Erro: ' + (err.error || 'Erro desconhecido'))
+          return
+        }
+        setExisting((p) => p.filter((x) => x.id !== img.id))
+      } catch (err) {
+        console.error(err)
+        alert('Erro ao remover imagem')
+      } finally {
+        setUploading(false)
+      }
     }
 
     useImperativeHandle(ref, () => ({
       uploadNewImages: async (produtoId: string): Promise<boolean> => {
         if (files.length === 0) return true
-        const supabase = createClient()
-        if (!supabase) return false
         setUploading(true)
         try {
-          for (let i = 0; i < files.length; i++) {
-            const file = files[i]
-            const ext = file.name.split('.').pop()
-            const name = `${produtoId}-${Date.now()}-${i}.${ext}`
-            const path = `produtos/${name}`
-            const { error: upErr } = await supabase.storage.from('imagens').upload(path, file)
-            if (upErr) { alert('Upload: ' + upErr.message); setUploading(false); return false }
-            const { data: { publicUrl } } = supabase.storage.from('imagens').getPublicUrl(path)
-            const ordem = existing.length + i + 1
-            const { error: dbErr } = await supabase.from('produto_imagens').insert({
-              produto_id: produtoId, url: publicUrl, ordem,
-            })
-            if (dbErr) { alert('Banco: ' + dbErr.message); setUploading(false); return false }
+          const formData = new FormData()
+          for (const file of files) {
+            formData.append('files', file)
           }
+
+          const res = await fetch(`/api/produtos/${produtoId}/imagens`, {
+            method: 'POST',
+            body: formData,
+          })
+
+          if (!res.ok) {
+            const err = await res.json()
+            alert('Upload: ' + (err.error || 'Erro desconhecido'))
+            setUploading(false)
+            return false
+          }
+
           setFiles([])
           setPreviews([])
           setUploading(false)
