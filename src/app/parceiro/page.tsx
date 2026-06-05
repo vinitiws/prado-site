@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { AnimatedSection } from '@/components/ui/animated-section'
+import { PartnerForm } from '@/components/parceiro/partner-form'
 
 export const metadata: Metadata = {
   title: 'Seja Parceiro',
@@ -83,32 +82,7 @@ export default function ParceiroPage() {
             <p className="text-sm text-bege mb-6">
               Preencha o formulário e nossa equipe entrará em contato.
             </p>
-            <form className="space-y-4">
-              <Input
-                id="nome"
-                label="Nome completo"
-                placeholder="Seu nome"
-              />
-              <Input
-                id="email"
-                label="E-mail"
-                type="email"
-                placeholder="seu@email.com"
-              />
-              <Input
-                id="telefone"
-                label="Telefone"
-                placeholder="(11) 99999-9999"
-              />
-              <Input
-                id="cidade"
-                label="Cidade / Estado"
-                placeholder="Sua cidade - UF"
-              />
-              <Button type="submit" variant="primary" size="lg" className="w-full">
-                Enviar
-              </Button>
-            </form>
+            <PartnerForm />
           </div>
         </div>
       </AnimatedSection>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,11 +9,27 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import type { SiteImagem } from '@/types'
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`)
+    setIsMobile(mq.matches)
+
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [breakpoint])
+
+  return isMobile
+}
+
 export function HeroCarousel() {
   const [slides, setSlides] = useState<SiteImagem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
+  const isMobile = useIsMobile(768)
 
   useEffect(() => {
     const supabase = createClient()
@@ -99,7 +116,7 @@ export function HeroCarousel() {
       <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] bg-marinho flex items-center justify-center">
         <div className="text-center text-branco">
           <p className="text-xl mb-2">📷 Nenhuma imagem no carousel</p>
-          <p className="text-sm text-bege">Adicione imagens do tipo "carousel" no banco de dados</p>
+          <p className="text-sm text-bege">Adicione imagens do tipo &ldquo;carousel&rdquo; no banco de dados</p>
         </div>
       </div>
     )
@@ -107,8 +124,12 @@ export function HeroCarousel() {
 
   const activeSlide = slides[current]
 
+  // Resolve mobile image with fallback
+  const mobileImageSrc = activeSlide.url_mobile || activeSlide.url
+  const isFirstSlide = current === 0
+
   return (
-    <div className="relative w-full h-[70vh] min-h-[400px] max-h-[700px] overflow-hidden bg-marinho">
+    <div className="relative w-full h-[100vh] min-h-[400px]  overflow-hidden bg-marinho">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -118,20 +139,33 @@ export function HeroCarousel() {
           transition={{ duration: 0.7 }}
           className="absolute inset-0"
         >
-          <div
-            className="hidden md:block absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${activeSlide.url})`,
-              backgroundColor: '#1C2632',
-            }}
-          />
-          <div
-            className="block md:hidden absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${activeSlide.url})`,
-              backgroundColor: '#1C2632',
-            }}
-          />
+          {/* Desktop image - hidden on mobile */}
+          <div className="hidden md:block absolute inset-0">
+            <Image
+              src={activeSlide.url}
+              alt={activeSlide.titulo || 'Slide do carousel'}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              preload={isFirstSlide && !isMobile}
+              loading={isFirstSlide && !isMobile ? undefined : 'lazy'}
+            />
+          </div>
+
+          {/* Mobile image - hidden on desktop */}
+          <div className="block md:hidden absolute inset-0">
+            <Image
+              src={mobileImageSrc}
+              alt={activeSlide.titulo || 'Slide do carousel'}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              preload={isFirstSlide && isMobile}
+              loading={isFirstSlide && isMobile ? undefined : 'lazy'}
+            />
+          </div>
+
+          {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-marinho/80 to-marinho/30" />
         </motion.div>
       </AnimatePresence>

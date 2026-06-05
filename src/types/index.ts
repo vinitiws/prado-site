@@ -52,6 +52,8 @@ export interface ProdutoImagem {
 }
 
 export interface SiteImagem {
+  url_mobile?: string
+  storage_path_mobile?: string
   id: string
   tipo: 'carousel' | 'card' | 'banner'
   url: string

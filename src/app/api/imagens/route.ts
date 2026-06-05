@@ -48,9 +48,10 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
   }
 
+  // Fetch both desktop and mobile URLs
   const { data: imagem, error: fetchError } = await supabase
     .from('site_imagens')
-    .select('url')
+    .select('url, url_mobile')
     .eq('id', id)
     .single()
 
@@ -58,22 +59,31 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: fetchError.message }, { status: 500 })
   }
 
+  // Collect all storage paths to delete
   const pathsToDelete: string[] = []
+
   if (imagem?.url) {
     const path = extractStoragePath(imagem.url, 'imagens')
     if (path) pathsToDelete.push(path)
   }
 
+  if (imagem?.url_mobile) {
+    const path = extractStoragePath(imagem.url_mobile, 'imagens')
+    if (path) pathsToDelete.push(path)
+  }
+
+  // Delete files from Storage
   if (pathsToDelete.length > 0) {
     const { error: storageError } = await supabase.storage
       .from('imagens')
       .remove(pathsToDelete)
 
     if (storageError) {
-      console.error('Erro ao deletar do Storage:', storageError)
+      console.error('Erro ao deletar arquivos do Storage:', storageError)
     }
   }
 
+  // Delete the database record
   const { error: deleteError } = await supabase
     .from('site_imagens')
     .delete()
@@ -83,6 +93,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: deleteError.message }, { status: 500 })
   }
 
+  console.log(`Imagem ${id} excluída: ${pathsToDelete.length} arquivo(s) removido(s) do Storage`)
   return NextResponse.json({ success: true })
 }
 
@@ -97,7 +108,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
   }
 
-  const allowedFields = ['ativo', 'ordem', 'titulo', 'subtitulo', 'link']
+  const allowedFields = [
+    'ativo', 'ordem', 'titulo', 'subtitulo', 'link',
+    'url_mobile',
+  ]
   const sanitized: Record<string, unknown> = {}
   for (const key of allowedFields) {
     if (key in updates) sanitized[key] = updates[key]
