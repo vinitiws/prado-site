@@ -13,6 +13,7 @@ const footerLinks = {
   contato: [
     { label: 'Mogi Guaçu - SP' },
     { label: 'comercial@pradocalcados.com.br' },
+    { label: 'SAC: sac@pradocalcados.com.br' },
   ],
 }
 

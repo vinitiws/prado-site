@@ -129,7 +129,7 @@ export function HeroCarousel() {
   const isFirstSlide = current === 0
 
   return (
-    <div className="relative w-full h-[100vh] min-h-[400px]  overflow-hidden bg-marinho">
+    <div className="relative w-full h-[100vh] min-h-[400px] max-h-[700px] overflow-hidden bg-marinho">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -159,14 +159,14 @@ export function HeroCarousel() {
               alt={activeSlide.titulo || 'Slide do carousel'}
               fill
               sizes="100vw"
-              className="object-cover"
+              className=" object-center" // usar object-conver para ter imagem boa, mas pode cortar um pouco.
               preload={isFirstSlide && isMobile}
               loading={isFirstSlide && isMobile ? undefined : 'lazy'}
             />
           </div>
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-marinho/80 to-marinho/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-marinho/0 to-marinho/0" />
         </motion.div>
       </AnimatePresence>
 
