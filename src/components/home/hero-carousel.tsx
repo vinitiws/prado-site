@@ -159,7 +159,7 @@ export function HeroCarousel() {
               alt={activeSlide.titulo || 'Slide do carousel'}
               fill
               sizes="100vw"
-              className=" object-center" // usar object-conver para ter imagem boa, mas pode cortar um pouco.
+              className="object-cover object-center" // usar object-conver para ter imagem boa, mas pode cortar um pouco.
               preload={isFirstSlide && isMobile}
               loading={isFirstSlide && isMobile ? undefined : 'lazy'}
             />

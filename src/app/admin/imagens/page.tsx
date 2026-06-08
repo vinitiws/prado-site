@@ -416,32 +416,32 @@ export default function AdminImagensPage() {
 
                         <button
                           onClick={() => setEditingImage(img)}
-                          className="mt-2 px-3 py-1.5 rounded-lg bg-azul/80 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-azul font-medium flex items-center gap-1.5 w-full justify-center"
+                          className="hidden md:flex mt-2 px-3 py-1.5 rounded-lg bg-azul/80 text-white text-xs md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-azul font-medium items-center gap-1.5 w-full justify-center"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                           Editar
                         </button>
                       </div>
 
-                      <div className="absolute top-2 left-2 flex gap-1" style={{ top: 'auto', bottom: '50%' }}>
+                      <div className="hidden md:flex absolute top-2 left-2 gap-1" style={{ top: 'auto', bottom: '50%' }}>
                         <button
                           onClick={() => handleMoveOrder(img.id, 'up')}
                           disabled={filtered.indexOf(img) === 0}
-                          className="p-1.5 rounded-lg bg-marinho/60 text-branco opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-marinho/80"
+                          className="p-1.5 rounded-lg bg-marinho/60 text-branco md:opacity-0 md:group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-marinho/80"
                           title="Mover para cima" >
                           <ArrowUp size={14} />
                         </button>
                         <button
                           onClick={() => handleMoveOrder(img.id, 'down')}
                           disabled={filtered.indexOf(img) === filtered.length - 1}
-                          className="p-1.5 rounded-lg bg-marinho/60 text-branco opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-marinho/80"
+                          className="p-1.5 rounded-lg bg-marinho/60 text-branco md:opacity-0 md:group-hover:opacity-100 transition-opacity disabled:opacity-0 hover:bg-marinho/80"
                           title="Mover para baixo"
                         >
                           <ArrowDown size={14} />
                         </button>
                       </div>
 
-                      <div className="absolute top-2 right-2 flex gap-1">
+                      <div className="hidden md:flex absolute top-2 right-2 gap-1">
                         <button
                           onClick={() => handleToggleActive(img)}
                           disabled={togglingId === img.id}
@@ -449,7 +449,7 @@ export default function AdminImagensPage() {
                             img.ativo
                               ? 'bg-amber-500/80 text-white'
                               : 'bg-green-500/80 text-white'
-                          } opacity-0 group-hover:opacity-100 hover:opacity-100 disabled:opacity-50`}
+                          } md:opacity-0 md:group-hover:opacity-100 hover:opacity-100 disabled:opacity-50`}
                           title={img.ativo ? 'Desativar' : 'Ativar'}
                         >
                           {img.ativo ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -457,9 +457,56 @@ export default function AdminImagensPage() {
                         <button
                           onClick={() => handleDelete(img.id)}
                           disabled={deletingId === img.id}
-                          className="p-1.5 rounded-lg bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 hover:bg-red-600"
+                          className="p-1.5 rounded-lg bg-red-500/80 text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity disabled:opacity-50 hover:bg-red-600"
                         >
                           <Trash2 size={14} />
+                        </button>
+                      </div>
+
+                      {/* Mobile action bar — always visible on small screens */}
+                      <div className="flex md:hidden items-center gap-1 px-3 pb-3 pt-0">
+                        <button
+                          onClick={() => setEditingImage(img)}
+                          className="flex-1 px-3 py-2 rounded-lg bg-azul/80 text-white text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-azul active:bg-azul"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleToggleActive(img)}
+                          disabled={togglingId === img.id}
+                          className={`p-2 rounded-lg $
+                            img.ativo
+                              ? 'bg-amber-500/80 text-white'
+                              : 'bg-green-500/80 text-white'
+                          } disabled:opacity-50`}
+                          title={img.ativo ? 'Desativar' : 'Ativar'}
+                        >
+                          {img.ativo ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                        <button
+                          onClick={() => handleMoveOrder(img.id, 'up')}
+                          disabled={filtered.indexOf(img) === 0}
+                          className="p-2 rounded-lg bg-marinho/60 text-branco disabled:opacity-20"
+                          title="Mover para cima"
+                        >
+                          <ArrowUp size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleMoveOrder(img.id, 'down')}
+                          disabled={filtered.indexOf(img) === filtered.length - 1}
+                          className="p-2 rounded-lg bg-marinho/60 text-branco disabled:opacity-20"
+                          title="Mover para baixo"
+                        >
+                          <ArrowDown size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(img.id)}
+                          disabled={deletingId === img.id}
+                          className="p-2 rounded-lg bg-red-500/80 text-white disabled:opacity-50"
+                          title="Excluir"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
