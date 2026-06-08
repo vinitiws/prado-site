@@ -1,10 +1,21 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Auth check first
+  const serverSupabase = await createClient()
+  if (!serverSupabase) {
+    return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
+  }
+  const { data: { user } } = await serverSupabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
   const { id: produtoId } = await params
   const supabase = createAdminClient()
   if (!supabase) {

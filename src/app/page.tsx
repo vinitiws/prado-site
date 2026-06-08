@@ -2,7 +2,7 @@ import { HeroCarousel } from '@/components/home/hero-carousel'
 import { ProductCards } from '@/components/home/product-cards'
 import { CategoryGrid } from '@/components/home/category-grid'
 import { BannerSection } from '@/components/home/banner-section'
-import { PromotionalBanner } from '@/components/home/promotional-banner'
+// import { PromotionalBanner } from '@/components/home/promotional-banner'
 import { AnimatedSection } from '@/components/ui/animated-section'
 
 async function getDestaques() {
@@ -43,11 +43,11 @@ export default async function Home() {
         <ProductCards produtos={destaques} />
       </AnimatedSection>
 
-      <PromotionalBanner 
+      {/* <PromotionalBanner 
         tipo="banner" 
         desktopHeight="h-[400px]"
         mobileHeight="h-[250px]"
-      />
+      /> */}
 
       <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="text-center mb-10">
@@ -72,11 +72,11 @@ export default async function Home() {
         />
       </AnimatedSection>
 
-      <PromotionalBanner 
+      {/* <PromotionalBanner 
         tipo="banner-pos-cta" 
         desktopHeight="h-[400px]"
         mobileHeight="h-[250px]"
-      />
+      /> */}
 
       <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

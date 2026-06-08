@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { FaWhatsapp } from "react-icons/fa";
@@ -9,6 +10,9 @@ const WHATSAPP_MESSAGE =
   'Olá! Gostaria de saber mais sobre os produtos Prado Calçados.'
 
 export function WhatsAppButton() {
+  const pathname = usePathname()
+  if (pathname.startsWith('/admin')) return null
+
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 
   return (

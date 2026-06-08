@@ -1,10 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { Package, Image as ImageIcon, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
-  if (!supabase) return <div>Supabase não configurado</div>
+
+  if (!supabase) {
+    redirect('/admin/login?error=supabase_not_configured')
+  }
+
+  // Verify user is authenticated
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    redirect('/admin/login')
+  }
+
+  // Verificar se o usuário tem role de admin (opcional — descomente se usar user_metadata.role)
+  // const role = user.user_metadata?.role
+  // if (role !== 'admin') {
+  //   redirect('/admin/login?error=unauthorized')
+  // }
 
   const { count: totalProdutos } = await supabase
     .from('produtos')
@@ -28,6 +45,10 @@ export default async function AdminDashboard() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-marinho mb-6">Dashboard</h1>
+
+      <p className="text-sm text-bege mb-6">
+        Logado como: {user.email}
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-branco rounded-xl border border-bege/20 p-6">
@@ -60,7 +81,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="bg-branco rounded-xl border border-bege/20 p-6">
-        <h2 className="text-lg font-bold text-marinho mb-4">Últimos Produtos</h2>
+        <h2 className="text-lg font-bold text-marinho mb-4">últimos Produtos</h2>
         {recentes && recentes.length > 0 ? (
           <div className="divide-y divide-bege/10">
             {recentes.map((p) => (

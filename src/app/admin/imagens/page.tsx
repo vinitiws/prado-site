@@ -1,13 +1,11 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Trash2, Eye, EyeOff, ArrowUp, ArrowDown, Upload, Smartphone, Monitor } from 'lucide-react'
 import type { SiteImagem } from '@/types'
 import { EditImageModal } from '@/components/admin/edit-image-modal'
-import type { SupabaseClient } from '@supabase/supabase-js'
-
-const supabaseClient = createClient()
+// supabase client is created lazily inside the component via useState
 
 const tipos = [
   { value: 'carousel' as const, label: 'Carousel (Hero)' },
@@ -25,7 +23,7 @@ function readFileAsDataURL(file: File): Promise<string> {
 }
 
 export default function AdminImagensPage() {
-  const supabaseRef = useRef<SupabaseClient | null>(supabaseClient)
+  const [supabase] = useState(() => createClient())
   const [imagens, setImagens] = useState<SiteImagem[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -50,7 +48,6 @@ export default function AdminImagensPage() {
   })
 
   const loadImagens = useCallback(async () => {
-    const supabase = supabaseRef.current
     if (!supabase) {
       setLoading(false)
       return

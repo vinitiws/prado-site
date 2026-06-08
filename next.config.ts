@@ -9,11 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Turbopack filesystem cache reduces memory by persisting compilation artifacts to disk
+  experimental: {
+    turbopackFileSystemCacheForDev: true,
+    // Disable preloading all entries on start to lower baseline memory usage
+    preloadEntriesOnStart: false,
+  },
 };
-
-// Em dev, usar /tmp/.next para evitar lentidão do filesystem do container
-if (process.env.NODE_ENV === "development") {
-  nextConfig.distDir = "/tmp/.next";
-}
 
 export default nextConfig;

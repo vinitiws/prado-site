@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -11,33 +10,49 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [redirectTo, setRedirectTo] = useState('/admin/dashboard')
   const router = useRouter()
-  const supabase = createClient()
+
+  useEffect(() => {
+    // Read redirect param safely without useSearchParams
+    const params = new URLSearchParams(window.location.search)
+    const redirect = params.get('redirect')
+    if (redirect) {
+      setRedirectTo(redirect)
+    }
+    const urlError = params.get('error')
+    if (urlError === 'supabase_not_configured') {
+      setError('Supabase não configurado corretamente.')
+    }
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    if (!supabase) {
-      setError('Supabase não configurado')
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Erro ao fazer login')
+        setLoading(false)
+        return
+      }
+
+      // Force RSC cache invalidation so server components see the new session
+      router.refresh()
+      router.push(redirectTo)
+    } catch (err) {
+      setError('Erro ao fazer login. Verifique sua conexão e tente novamente.')
       setLoading(false)
-      return
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
-
-    router.push('/admin/dashboard')
-    router.refresh()
   }
 
   return (

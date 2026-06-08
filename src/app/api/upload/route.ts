@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -74,6 +75,16 @@ async function uploadFile(
 }
 
 export async function POST(request: Request) {
+  // Auth check
+  const serverSupabase = await createClient()
+  if (!serverSupabase) {
+    return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
+  }
+  const { data: { user } } = await serverSupabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
   const supabase = createAdminClient()
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })

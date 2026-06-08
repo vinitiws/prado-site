@@ -34,6 +34,12 @@ export async function PUT(
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
   }
 
+  // Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
   const body = await request.json()
 
   const { data, error } = await supabase
@@ -58,6 +64,12 @@ export async function DELETE(
   const supabase = await createClient()
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
+  }
+
+  // Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
   const { error } = await supabase.from('produtos').delete().eq('id', id)

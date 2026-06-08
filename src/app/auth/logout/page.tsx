@@ -1,22 +1,26 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LogoutPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
-    if (!supabase) {
-      router.push('/')
-      return
-    }
-    supabase.auth.signOut().then(() => {
-      router.push('/')
+    async function handleLogout() {
+      if (!supabase) {
+        router.push('/admin/login')
+        return
+      }
+
+      await supabase.auth.signOut()
       router.refresh()
-    })
+      router.push('/admin/login')
+    }
+
+    handleLogout()
   }, [supabase, router])
 
   return (

@@ -8,10 +8,24 @@ export async function GET() {
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
   }
 
+  // Auth check: if user is authenticated, return all images; otherwise only active
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    const { data, error } = await supabase
+      .from('site_imagens')
+      .select('*')
+      .eq('ativo', true)
+      .order('ordem')
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json(data)
+  }
+
   const { data, error } = await supabase
     .from('site_imagens')
     .select('*')
-    .eq('ativo', true)
     .order('ordem')
 
   if (error) {
@@ -38,6 +52,16 @@ function extractStoragePath(url: string, bucket: string): string | null {
 }
 
 export async function DELETE(request: Request) {
+  // Auth check
+  const serverSupabase = await createClient()
+  if (!serverSupabase) {
+    return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
+  }
+  const { data: { user } } = await serverSupabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
   const supabase = createAdminClient()
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
@@ -98,6 +122,16 @@ export async function DELETE(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  // Auth check
+  const serverSupabase = await createClient()
+  if (!serverSupabase) {
+    return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
+  }
+  const { data: { user } } = await serverSupabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
   const supabase = createAdminClient()
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
