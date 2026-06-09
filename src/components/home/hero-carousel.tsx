@@ -130,7 +130,7 @@ export function HeroCarousel() {
 
   return (
     <div className="relative w-full h-[100vh] min-h-[400px] max-h-[700px] overflow-hidden bg-marinho">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="sync">
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
@@ -172,7 +172,7 @@ export function HeroCarousel() {
 
       <div className="relative z-10 flex h-full items-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">
             <motion.div
               key={`content-${current}`}
               initial={{ opacity: 0, y: 30 }}
