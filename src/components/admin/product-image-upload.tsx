@@ -59,7 +59,7 @@ export const ProductImageUpload = forwardRef<ProductImageUploadHandle, ProductIm
         const res = await fetch('/api/produtos/imagens', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageId: img.id }),
+          body: JSON.stringify({ id: img.id }),
         })
         if (!res.ok) {
           const err = await res.json()
