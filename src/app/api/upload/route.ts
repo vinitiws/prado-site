@@ -12,6 +12,8 @@ const uploadSchema = z.object({
   id: z.string().nullable().optional(),
   titulo: z.string().nullable().optional(),
   subtitulo: z.string().nullable().optional(),
+  descricao: z.string().nullable().optional(),
+  cta_texto: z.string().nullable().optional(),
   link: z.string().nullable().optional(),
   ordem: z.coerce.number().int().min(0).default(0),
 })
@@ -120,6 +122,8 @@ export async function POST(request: Request) {
     id: formData.get('id'),
     titulo: formData.get('titulo'),
     subtitulo: formData.get('subtitulo'),
+    descricao: formData.get('descricao'),
+    cta_texto: formData.get('cta_texto'),
     link: formData.get('link'),
     ordem: formData.get('ordem'),
   })
@@ -129,7 +133,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errors }, { status: 400 })
   }
 
-  const { tipo, titulo, subtitulo, link, ordem } = parsed.data
+  const { tipo, titulo, subtitulo, descricao, cta_texto, link, ordem } = parsed.data
 
   // Upload desktop image if provided
   let desktopResult: UploadResult | null = null
@@ -163,6 +167,8 @@ export async function POST(request: Request) {
     const updateData: Record<string, unknown> = {
       titulo: titulo || null,
       subtitulo: subtitulo || null,
+      descricao: descricao || null,
+      cta_texto: cta_texto || null,
       link: link || null,
     }
 
@@ -215,6 +221,8 @@ export async function POST(request: Request) {
     url: desktopResult!.publicUrl,
     titulo: titulo || null,
     subtitulo: subtitulo || null,
+    descricao: descricao || null,
+    cta_texto: cta_texto || null,
     link: link || null,
     ordem,
   }

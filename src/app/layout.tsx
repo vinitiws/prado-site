@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/layout/navbar";
 import { ConditionalFooter } from "@/components/layout/conditional-footer";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { NavbarVisibility } from "@/components/layout/navbar-visibility";
 
 export const metadata: Metadata = {
   title: {
@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <Navbar />
+        <NavbarVisibility />
         <main className="flex-1">{children}</main>
         <ConditionalFooter />
         <WhatsAppButton />

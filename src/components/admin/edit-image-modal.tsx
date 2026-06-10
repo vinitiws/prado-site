@@ -15,6 +15,8 @@ interface EditImageModalProps {
 export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps) {
   const [titulo, setTitulo] = useState(image?.titulo || '')
   const [subtitulo, setSubtitulo] = useState(image?.subtitulo || '')
+  const [descricao, setDescricao] = useState(image?.descricao || '')
+  const [ctaTexto, setCtaTexto] = useState(image?.cta_texto || '')
   const [link, setLink] = useState(image?.link || '')
   const [saving, setSaving] = useState(false)
 
@@ -57,18 +59,15 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
       if (hasAnyFile) {
         const body = new FormData()
 
-        // Always send at least one file
-        if (desktopFile) {
-          body.append('file', desktopFile)
-        }
-        if (mobileFile) {
-          body.append('mobile_file', mobileFile)
-        }
+        if (desktopFile) body.append('file', desktopFile)
+        if (mobileFile) body.append('mobile_file', mobileFile)
 
         body.append('tipo', image.tipo)
         body.append('id', image.id)
         body.append('titulo', titulo)
         body.append('subtitulo', subtitulo)
+        body.append('descricao', descricao)
+        body.append('cta_texto', ctaTexto)
         body.append('link', link)
 
         const res = await fetch('/api/upload', { method: 'POST', body })
@@ -79,7 +78,6 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
           return
         }
       } else {
-        // Only update text metadata
         const res = await fetch('/api/imagens', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -87,6 +85,8 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
             id: image.id,
             titulo: titulo || null,
             subtitulo: subtitulo || null,
+            descricao: descricao || null,
+            cta_texto: ctaTexto || null,
             link: link || null,
           }),
         })
@@ -109,7 +109,10 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-branco rounded-xl p-6 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="bg-branco rounded-xl p-6 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-marinho">Editar Imagem</h2>
           <button onClick={onClose} className="p-1 hover:bg-bege/10 rounded-lg">
@@ -134,11 +137,7 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
 
           <label className="flex items-center gap-2 cursor-pointer text-sm text-azul hover:text-azul/80">
             <Upload size={16} />
-            <span>
-              {desktopFile
-                ? desktopFile.name
-                : 'Substituir imagem desktop'}
-            </span>
+            <span>{desktopFile ? desktopFile.name : 'Substituir imagem desktop'}</span>
             <input
               type="file"
               accept="image/webp,image/jpeg,image/png"
@@ -146,9 +145,7 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
               className="hidden"
             />
           </label>
-          <p className="text-xs text-bege/40 mt-1">
-            Deixe vazio para manter a imagem desktop atual.
-          </p>
+          <p className="text-xs text-bege/40 mt-1">Deixe vazio para manter a imagem desktop atual.</p>
         </div>
 
         {/* Mobile image preview and upload */}
@@ -188,7 +185,7 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <Input
             id="edit-titulo"
             label="Título"
@@ -207,7 +204,29 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
               className="flex h-11 w-full rounded-lg border border-bege bg-branco px-4 py-2 text-sm text-marinho focus:outline-none focus:ring-2 focus:ring-safety placeholder:text-bege/70"
             />
           </div>
+        </div>
 
+        <div className="mb-4">
+          <label htmlFor="edit-descricao" className="block text-sm font-medium text-marinho mb-1">
+            Descrição
+          </label>
+          <textarea
+            id="edit-descricao"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            rows={3}
+            className="flex w-full rounded-lg border border-bege bg-branco px-4 py-2 text-sm text-marinho focus:outline-none focus:ring-2 focus:ring-safety placeholder:text-bege/70 resize-none"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <Input
+            id="edit-cta-texto"
+            label="Texto do Botão"
+            value={ctaTexto}
+            onChange={(e) => setCtaTexto(e.target.value)}
+            placeholder="Saiba mais"
+          />
           <Input
             id="edit-link"
             label="Link"
@@ -215,15 +234,15 @@ export function EditImageModal({ image, onClose, onSaved }: EditImageModalProps)
             onChange={(e) => setLink(e.target.value)}
             placeholder="https://..."
           />
+        </div>
 
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Salvando...' : 'Salvar'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-          </div>
+        <div className="flex gap-3 pt-2">
+          <Button type="button" variant="primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Salvando...' : 'Salvar'}
+          </Button>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
         </div>
       </div>
     </div>

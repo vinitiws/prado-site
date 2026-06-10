@@ -143,7 +143,7 @@ export async function PATCH(request: Request) {
   }
 
   const allowedFields = [
-    'ativo', 'ordem', 'titulo', 'subtitulo', 'link',
+    'ativo', 'ordem', 'titulo', 'subtitulo', 'descricao', 'cta_texto', 'link',
     'url_mobile',
   ]
   const sanitized: Record<string, unknown> = {}

@@ -1,0 +1,39 @@
+/* Slider — touch + parallax */
+
+.root {
+  /* permite scroll vertical da página; capture só o arrasto horizontal */
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.track {
+  /* GPU-accelerated transforms */
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  /* sem snap CSS — controlamos via GSAP para uma transição mais suave */
+}
+
+.layer {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  pointer-events: none;
+}
+
+/* Reduced motion: desliga parallax e auto-advance transições */
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .track,
+  .layer {
+    transition: none !important;
+    animation: none !important;
+  }
+}

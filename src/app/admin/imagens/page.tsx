@@ -44,6 +44,8 @@ export default function AdminImagensPage() {
     tipo: 'carousel' as SiteImagem['tipo'],
     titulo: '',
     subtitulo: '',
+    descricao: '',
+    cta_texto: '',
     link: '',
   })
 
@@ -96,6 +98,8 @@ export default function AdminImagensPage() {
     body.append('tipo', form.tipo)
     if (form.titulo) body.append('titulo', form.titulo)
     if (form.subtitulo) body.append('subtitulo', form.subtitulo)
+    if (form.descricao) body.append('descricao', form.descricao)
+    if (form.cta_texto) body.append('cta_texto', form.cta_texto)
     if (form.link) body.append('link', form.link)
     body.append('ordem', String(imagens.length))
 
@@ -109,7 +113,7 @@ export default function AdminImagensPage() {
       return
     }
 
-    setForm({ tipo: 'carousel', titulo: '', subtitulo: '', link: '' })
+    setForm({ tipo: 'carousel', titulo: '', subtitulo: '', descricao: '', cta_texto: '', link: '' })
     setSelectedFile(null)
     setPreview(null)
     setSelectedMobileFile(null)
@@ -224,12 +228,24 @@ export default function AdminImagensPage() {
               className="flex h-11 w-full rounded-lg border border-bege bg-branco px-4 py-2 text-sm text-marinho focus:outline-none focus:ring-2 focus:ring-safety placeholder:text-bege/70"
             />
           </div>
+          <div>
+            <label htmlFor="descricao" className="block text-sm font-medium text-marinho mb-1">
+              Descrição
+            </label>
+            <textarea
+              id="descricao"
+              value={form.descricao}
+              onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
+              rows={2}
+              className="flex w-full rounded-lg border border-bege bg-branco px-4 py-2 text-sm text-marinho focus:outline-none focus:ring-2 focus:ring-safety placeholder:text-bege/70 resize-none"
+            />
+          </div>
           <Input
-            id="link"
-            label="Link"
-            value={form.link}
-            onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
-            placeholder="https://..."
+            id="cta_texto"
+            label="Texto do Botão"
+            value={form.cta_texto}
+            onChange={(e) => setForm((f) => ({ ...f, cta_texto: e.target.value }))}
+            placeholder="Saiba mais"
           />
         </div>
 

@@ -1,4 +1,4 @@
-import { HeroCarousel } from '@/components/home/hero-carousel'
+import { InteractiveHero } from '@/components/hero'
 import { ProductCards } from '@/components/home/product-cards'
 import { CategoryGrid } from '@/components/home/category-grid'
 import { BannerSection } from '@/components/home/banner-section'
@@ -24,16 +24,18 @@ async function getDestaques() {
   }
 }
 
+
 export default async function Home() {
   const destaques = await getDestaques()
 
   return (
     <div className="flex flex-col">
-      <HeroCarousel />
+      <InteractiveHero />
 
-      <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+
+      <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-marinho mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-marinho mb-3 mt-10">
             Produtos em Destaque
           </h2>
           <p className="text-bege text-sm sm:text-base max-w-lg mx-auto">

@@ -61,6 +61,8 @@ export interface SiteImagem {
   link: string | null
   titulo: string | null
   subtitulo: string | null
+  descricao: string | null
+  cta_texto: string | null
   ordem: number
   ativo: boolean
   created_at: string
