@@ -63,6 +63,20 @@ export default function EditarProdutoPage({ params }: Props) {
           especificacoes_biqueira: (produto.especificacoes as any)?.biqueira || '',
           especificacoes_norma: (produto.especificacoes as any)?.norma || '',
         })
+
+        // Resolve a categoria da subcategoria do produto para preencher o select
+        if (produto.subcategoria_id) {
+          const { data: sub } = await supabase
+            .from('subcategorias')
+            .select('*, categorias!inner(slug)')
+            .eq('id', produto.subcategoria_id)
+            .single()
+
+          if (sub) {
+            const categoriaSlug = (sub as any).categorias?.slug
+            if (categoriaSlug) setSelectedCat(categoriaSlug)
+          }
+        }
       }
 
       const { data: cats } = await supabase

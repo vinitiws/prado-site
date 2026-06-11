@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navLinks = [
@@ -13,7 +13,20 @@ const navLinks = [
   { href: '/parceiro', label: 'Seja Parceiro' },
 ]
 
-export function HeroNavbar() {
+function HamburgerIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+    </svg>
+  )
+}
+
+interface HeroNavbarProps {
+  bgGradient?: string
+}
+
+export function HeroNavbar({ bgGradient }: HeroNavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -82,7 +95,7 @@ export function HeroNavbar() {
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Abrir menu"
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? <X size={24} /> : <HamburgerIcon />}
         </button>
       </div>
 
@@ -92,14 +105,27 @@ export function HeroNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-branco border-t border-bege/20 overflow-hidden"
+            className={`md:hidden overflow-hidden transition-all duration-500 ${
+              scrolled
+                ? 'bg-branco/95 backdrop-blur-sm'
+                : ''
+            }`}
+            style={{
+              background: !scrolled && bgGradient
+                ? bgGradient
+                : undefined,
+            }}
           >
             <nav className="flex flex-col px-4 py-4 space-y-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-base font-medium text-azul/70 hover:text-azul py-2 transition-colors"
+                  className={`text-base font-medium py-2 transition-colors ${
+                    scrolled
+                      ? 'text-azul/70 hover:text-azul'
+                      : 'text-branco/80 hover:text-branco'
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}

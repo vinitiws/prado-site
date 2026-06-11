@@ -156,7 +156,7 @@ function HeroProduct({ slide: { image, title } }: { slide: HeroSlide }) {
             alt={title}
             fill
             sizes="(max-width: 768px) 80vw, 50vw"
-            className="object-contain drop-shadow-2xl"
+            className="relative object-contain drop-shadow-2xl"
             priority
             unoptimized
           />
@@ -214,6 +214,7 @@ export function InteractiveHero() {
 
   const heroRef = useRef<HTMLDivElement>(null)
   const bgRef = useRef<HTMLDivElement>(null)
+  const mainContentRef = useRef<HTMLDivElement>(null)
   const oldContentRef = useRef<HTMLDivElement>(null)
   const oldProductRef = useRef<HTMLDivElement>(null)
   const newContentRef = useRef<HTMLDivElement>(null)
@@ -292,6 +293,123 @@ export function InteractiveHero() {
     return () => { tl.kill() }
   }, [transitionState])
 
+  /* ── Mobile drag / swipe ── */
+  const dragState = useRef({
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    startTime: 0,
+    width: 0,
+    isDragging: false,
+    isHorizontal: false,
+    traveled: 0,
+  })
+
+  const DRAG_THRESHOLD = 50
+  const DRAG_ACTIVATION = 4
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (slides.length <= 1 || transitionState !== 'idle') return
+    const t = e.touches[0]
+    dragState.current = {
+      startX: t.clientX,
+      startY: t.clientY,
+      currentX: t.clientX,
+      startTime: performance.now(),
+      width: mainContentRef.current?.offsetWidth ?? window.innerWidth,
+      isDragging: true,
+      isHorizontal: false,
+      traveled: 0,
+    }
+    if (mainContentRef.current) {
+      gsap.killTweensOf(mainContentRef.current)
+    }
+    // Pause autoplay
+    if (autoPlayRef.current) {
+      clearInterval(autoPlayRef.current)
+      autoPlayRef.current = null
+    }
+  }, [slides.length, transitionState])
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragState.current.isDragging || transitionState !== 'idle') return
+    const t = e.touches[0]
+    const dx = t.clientX - dragState.current.startX
+    const dy = t.clientY - dragState.current.startY
+
+    // Determine direction after first few px of movement
+    if (!dragState.current.isHorizontal) {
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > DRAG_ACTIVATION) {
+        dragState.current.isDragging = false // let vertical scroll pass through
+        return
+      }
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > DRAG_ACTIVATION) {
+        dragState.current.isHorizontal = true
+        e.preventDefault()
+      }
+    }
+
+    if (!dragState.current.isHorizontal) return
+    e.preventDefault()
+
+    dragState.current.currentX = t.clientX
+    dragState.current.traveled = dx
+
+    if (mainContentRef.current) {
+      gsap.set(mainContentRef.current, { x: dx, overwrite: 'auto' })
+    }
+  }, [transitionState])
+
+  const onTouchEnd = useCallback(() => {
+    const mainContent = mainContentRef.current
+    if (!dragState.current.isHorizontal || transitionState !== 'idle') {
+      dragState.current.isDragging = false
+      // Snap back if there was any residual transform
+      if (mainContent) {
+        gsap.to(mainContent, { x: 0, duration: 0.22, ease: 'power2.out', overwrite: 'auto' })
+      }
+      return
+    }
+
+    const traveled = dragState.current.traveled
+    const elapsed = performance.now() - dragState.current.startTime
+    const velocity = elapsed > 0 ? Math.abs(traveled) / elapsed : 0
+    const shouldChangeSlide = Math.abs(traveled) >= DRAG_THRESHOLD || velocity > 0.35
+    dragState.current.isDragging = false
+
+    if (!mainContent || !shouldChangeSlide) {
+      if (mainContent) {
+        gsap.to(mainContent, { x: 0, duration: 0.22, ease: 'power2.out', overwrite: 'auto' })
+      }
+      return
+    }
+
+    const direction = traveled < 0 ? -1 : 1
+    const nextIndex = traveled < 0
+      ? (current + 1) % slides.length
+      : (current - 1 + slides.length) % slides.length
+    const width = dragState.current.width || mainContent.offsetWidth || window.innerWidth
+
+    gsap.to(mainContent, {
+      x: direction * width,
+      duration: 0.18,
+      ease: 'power2.out',
+      overwrite: 'auto',
+      onComplete: () => {
+        setCurrent(nextIndex)
+        requestAnimationFrame(() => {
+          gsap.set(mainContent, { x: -direction * width })
+          gsap.to(mainContent, {
+            x: 0,
+            duration: 0.28,
+            ease: 'power3.out',
+            overwrite: 'auto',
+          })
+        })
+      },
+    })
+  }, [transitionState, current, slides.length])
+
   // Auto‑play
   useEffect(() => {
     if (slides.length <= 1) return
@@ -327,7 +445,7 @@ export function InteractiveHero() {
   }
 
   return (
-    <div ref={heroRef} className="relative w-full min-h-screen overflow-hidden">
+    <div ref={heroRef} className="relative w-full h-screen overflow-hidden">
       {/* Live background layer */}
       <div
         ref={bgRef}
@@ -349,12 +467,19 @@ export function InteractiveHero() {
         }}
       />
 
-      <HeroNavbar />
+      <HeroNavbar bgGradient={bgGradient} />
 
       {/* Main content */}
-      <div className="relative z-10 w-full min-h-screen flex flex-col lg:flex-row">
+      <div
+        ref={mainContentRef}
+        className="relative z-10 w-full h-full flex flex-col lg:flex-row pt-20"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* ── Product right ── */}
-        <div className="relative w-full lg:w-[60%] h-[40vh] lg:h-screen order-first lg:order-last overflow-hidden">
+        <div className="relative w-full lg:w-[60%] h-[40vh] lg:h-[calc(100vh-5rem)] order-first lg:order-last overflow-hidden">
           {isTransitioning && (
             <div ref={oldProductRef} className="absolute inset-0">
               <HeroProduct slide={slides[current]} />
@@ -366,7 +491,7 @@ export function InteractiveHero() {
         </div>
 
         {/* ── Content left ── */}
-        <div className="relative w-full lg:w-[40%] h-[60vh] lg:h-screen order-last lg:order-first overflow-hidden">
+        <div className="relative w-full lg:w-[40%] h-[60vh] lg:h-[calc(100vh-5rem)] order-last lg:order-first overflow-hidden">
           {isTransitioning && (
             <div ref={oldContentRef} className="absolute inset-0 flex items-center px-6 sm:px-10 lg:px-14">
               <HeroContent slide={slides[current]} containerRef={oldContentRef} />
@@ -379,7 +504,7 @@ export function InteractiveHero() {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col sm:flex-row items-center justify-between px-6 sm:px-10 lg:px-14 gap-4">
+      <div className="relative sm:absolute sm:bottom-8 left-0 right-0 z-20 flex flex-col sm:flex-row items-center justify-between px-6 sm:px-10 lg:px-14 gap-4 pb-6 sm:pb-0">
         <div className="hidden sm:flex items-center gap-3 text-branco/50 text-sm font-medium tracking-wider">
           <span className="text-branco text-lg font-bold">
             {String(current + 1).padStart(2, '0')}
