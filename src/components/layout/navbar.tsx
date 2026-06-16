@@ -56,7 +56,7 @@ export function Navbar() {
             href="/sac"
             className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-country text-branco px-4 py-2 text-sm font-semibold transition-all hover:bg-country/90 hover:shadow-md"
           >
-            📞 Central de Atendimento
+            📞 SAC
           </Link>
 
           <button
@@ -93,7 +93,7 @@ export function Navbar() {
                 className="flex items-center gap-2 rounded-lg bg-country text-branco px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-country/90"
                 onClick={() => setIsOpen(false)}
               >
-                📞 Central de Atendimento
+                📞 SAC
               </Link>
             </nav>
           </motion.div>
