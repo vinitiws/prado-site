@@ -112,6 +112,17 @@ export default async function Home() {
           </div>
         </div>
       </AnimatedSection>
+
+      <AnimatedSection className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
+        <BannerSection
+          variant="default"
+          title="Precisa de ajuda?"
+          subtitle="Registre sua solicitação, reclamação ou sugestão. Nossa equipe analisa cada caso com atenção e retorna em até 5 dias úteis."
+          cta="Central de Atendimento"
+          href="/sac"
+          disableAnimation={true}
+        />
+      </AnimatedSection>
     </div>
   )
 }

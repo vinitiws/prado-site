@@ -51,13 +51,22 @@ export function Navbar() {
           ))}
         </nav>
 
-        <button
-          className="md:hidden p-2 text-azul"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Abrir menu"
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/sac"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-country text-branco px-4 py-2 text-sm font-semibold transition-all hover:bg-country/90 hover:shadow-md"
+          >
+            📞 Central de Atendimento
+          </Link>
+
+          <button
+            className="md:hidden p-2 text-azul"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Abrir menu"
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -79,6 +88,13 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/sac"
+                className="flex items-center gap-2 rounded-lg bg-country text-branco px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-country/90"
+                onClick={() => setIsOpen(false)}
+              >
+                📞 Central de Atendimento
+              </Link>
             </nav>
           </motion.div>
         )}
