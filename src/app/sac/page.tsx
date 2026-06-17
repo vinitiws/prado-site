@@ -63,7 +63,7 @@ export default function SacPage() {
         </div>
 
         {/* ── Info Cards ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">
           {[
             {
               icon: '📞',
@@ -97,7 +97,7 @@ export default function SacPage() {
             >
               <div className="text-xl sm:text-2xl mb-1.5">{card.icon}</div>
               <div className="text-xs font-semibold text-marinho mb-0.5">{card.title}</div>
-              <div className="text-[11px] text-bege leading-relaxed whitespace-pre-line">
+              <div className="text-[11px] text-bege leading-relaxed whitespace-pre-line break-all">
                 {card.text}
               </div>
             </div>
