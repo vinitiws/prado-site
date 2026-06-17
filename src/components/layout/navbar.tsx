@@ -31,12 +31,11 @@ export function Navbar() {
             alt="Prado Calçados Logo"
             className="h-8 w-auto"
           />
-          <span className="text-xl font-bold text-marinho tracking-tight">
-            PRADO
-          </span>
-          <span className="hidden sm:inline text-sm text-safety font-medium">
-            CALÇADOS
-          </span>
+          <img
+            src="/logoazul.png"
+            alt="Prado Calçados Logo"
+            className="h-20 w-auto"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
