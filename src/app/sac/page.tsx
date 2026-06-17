@@ -68,7 +68,7 @@ export default function SacPage() {
             {
               icon: '📞',
               title: 'Telefone / WhatsApp',
-              text: '(35) 3366-1234\nSeg–Sex, 08h–17h',
+              text: '(19) 998256810\nSeg–Sex, 08h–17h',
             },
             {
               icon: '📧',
