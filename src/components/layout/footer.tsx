@@ -26,7 +26,7 @@ export function Footer() {
             <img
               src="/logo-principal.png"
               alt="Prado Calçados Logo"
-              className="h-10 w-auto"
+              className="h-12 w-auto"
             />
             {/* <h3 className="text-lg font-bold">PRADO CALÇADOS</h3> */}
             <p className="text-sm text-bege/80 leading-relaxed">

@@ -32,9 +32,9 @@ export function Navbar() {
             className="h-8 w-auto"
           />
           <img
-            src="/logoazul.png"
+            src="/logo-azul-semfundo.png"
             alt="Prado Calçados Logo"
-            className="h-20 w-auto"
+            className="h-16 w-auto"
           />
         </Link>
 
